@@ -14,6 +14,9 @@ class Plotter:
     def add_polygon(self, xs, ys):
         plt.fill(xs, ys, 'lightblue', label='Polygon')
 
+    def add_poly_outline(self, xs, ys):
+        plt.fill(xs, ys, 'red', fill=None, label='MBR') #need to make the outline red
+
     def add_point(self, x, y, kind=None):
         if kind == "outside":
             plt.plot(x, y, "ro", label='Outside')
