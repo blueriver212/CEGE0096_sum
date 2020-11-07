@@ -1,5 +1,5 @@
 from plotter import Plotter
-import numpy as np
+import sys
 
 def import_points(path):
     """
@@ -7,10 +7,7 @@ def import_points(path):
     :param path is a directory to the csv file containing polygon points
     :return A tuple with the points' > [0]= IDs, [1] = Xs [2] = Ys:
     """
-    points_all = []
-    id_ = []
-    x_ = []
-    y_ = []
+    points_all, id_, x_, y_ = [], [], [], []
     # Open file
     with open(path, 'r') as f:
         points = f.readlines()
@@ -127,10 +124,11 @@ class Inside:
 
     def points_on_line(self):
         # find values for on_line_func
-        coordinate = []
-        not_classified = []
+        on_line = []
+        # not_classified = []
         # remove the vertex points for calculation, as already on boundary
         vertex_points = self.on_vertex()
+        print(vertex_points)
         points_to_test = [i for i in self.__coords if i not in vertex_points]
 
         for i in range(len(points_to_test)):
@@ -150,30 +148,162 @@ class Inside:
                 #use above on_line() to calculate if point is on the line but also within the two points
                 if self.on_line_func(x, x1, x2, y, y1, y2) == True:
                     if y >= min(y1, y2) and y <= max(y1, y2) and x >= min(x1, x2) and x <= max(x1,x2):  # little mbr algorithm
-                         coordinate.append((x, y))
-                    else:
-                        not_classified.append((x,y)) #not classified points
+                         on_line.append((x, y))
+                    # else:
+                    #     not_classified.append((x,y)) #not classified points
 
-        return coordinate, not_classified
+        not_classified = [i for i in points_to_test if i not in on_line]
+        return on_line, not_classified
+
+class Polygon:
+
+
+    def __init__(self, points, poly):
+        """
+        points: a list of points in clockwise order
+        """
+        self.__points = points
+        self.__poly = poly
+        self.edge_list = []
+
+        # Create an edge list from the polygon file
+        for i, p in enumerate(self.__poly):
+            p1 = p
+            p2 = self.__poly[(i+1) % len(self.__poly)]
+            self.edge_list.append((p1, p2))
+
+    def cross_edge(self, point_x, point_y, edge):
+
+        _huge = sys.float_info.max  # _huge acts as infinity for ray
+        _tiny = 0.0000001  # _tiny is used to make sure the points are not on verticies
+
+        A, B = edge[0], edge[1]
+        if A[1] > B[1]:
+            A, B = B, A
+
+        A_x, A_y = A[0], A[1]
+        B_x, B_y = B[0], B[1]
+
+        # make sure that point does not intercept a vertex
+        if point_y == A_y or point_y == B_y:
+            point_y += _tiny  # add the small value
+
+        if point_x == A_x or point_x == B_x:
+            point_x += _tiny  # add the small value
+
+        intersect = False
+
+        if (point_y > B_y or point_y < A_y) or (point_x > max(A_x, B_x)):
+            # the ray does not intersect with the edge
+            return intersect
+
+        if point_x < min(A_x, B_x):
+            intersect = True
+            return intersect
+
+
+        try:
+            m_edge = (B_y - A_y) / (B_x - A_x)
+        except ZeroDivisionError:
+            m_edge = _huge
+
+        try:
+            m_point = (point_y - B_y) / (point_x - B_x)
+        except ZeroDivisionError:
+            m_point = _huge
+
+        if m_point < m_edge:
+            # The ray intersects with the edge
+            # count += 1
+            intersect = True
+
+        return intersect
+
+    def rca(self):
+
+        inside = []
+        outside = []
+        for point in self.__points:
+            count = 0 #number of times it crosses an edge
+            point_x = point[0]
+            point_y = point[1]
+
+            for edge in self.edge_list:
+                is_inside = self.cross_edge(point_x, point_y, edge)
+                if is_inside == True:
+                    count += 1
+
+            if count % 2 == 0:
+                outside.append(point)
+            else:
+                inside.append(point)
+            print(point)
+            print(count)
+        return inside, outside
 
 
 class RCA:
     """
     This takes all of the points that have not already been classified and conducts the RCA analysis.
     """
-    def __init__(self, xs, ys, poly):
-        self.___xs = xs
-        self.__ys = ys
+    def __init__(self, points, poly):
+        # self.__xs = xs
+        # self.__ys = ys
+        self.__points = points
         self.__poly = poly
+
+        #self.__points = zip(self.__xs, self.__ys) # make list of coordinate tuples
+        max_x = max(x for x, y in self.__poly) + 1 # Gives you 1 more x point in the x direction
 
     def lines(self):
         pass
 
-    def slope(self):
-        pass
+    def slope(self, x1, x2, y1, y2):
+        #return the slope of two points
+        m = (y2-y1)/(x2-x1)
+        return m
 
     def y_intercept(self):
-        pass
+        b1 = self.y1 - (self.x1 * self.m1)
+        return b1
+
+    def intersection(self, x1, x2, y1, y2, x3, x4, y3, y4):
+        m1 = self.slope(x1, x2, y1, y2) # slope of the first line
+        m2 = self.slope(x3, x4, y3, y4) # slope of the second line
+
+        # calculate the point at which they intercept
+        x = (self.b2 -self.b1)/(self.m1 - self.m2)
+        y = ((self.b2 * self.m1) - (self.b1*self.m2))/(self.m1 - self.m2)
+        return x, y
+
+    def do_intersect(self):
+        """
+        tests whether two points intersect
+        :return:
+        """
+
+    def get_intersection(self):
+        intersection_points = []
+
+        if self.do_intersect() == True:
+            for i in range(1, len(self.__poly)):
+                x1_ = self.__poly[i-1][0]
+                y1_ = self.__poly[i-1][1]
+
+                x2_ = self.__poly[i][0]
+                y2_ = self.__poly[i][1]
+
+                for j in range(len(self.__points)):
+                    x3_ = self.__points([j][0]) #error seems to be here, list not callable
+                    y3_ = self.__points([j][1])
+
+                    x4_ = self.max_x  #Always tends to the same x value
+                    y4_ = y3_ #Always on the same horizontal plane, so same as y4
+
+                    test_intersection = self.intersection(x1_, x2_, y1_, y2_, x3_, x4_, y3_, y4_)
+                    intersection_points.append(test_intersection)
+
+        return intersection_points
 
 
 def main(polygon, input):
@@ -201,13 +331,17 @@ def main(polygon, input):
     x = points[1]
     y = points[2]
 
+    x = [2]
+    y = [2]
+
+
     # Test whether these points are within the Polygon's MBR
     poly_mbr = InsideMBR(x, y, mbr[0], mbr[1])
     mbr_ = poly_mbr.is_inside()
     coord_inside_mbr = mbr_[0]
     coord_outside_mbr = mbr_[1]
-
     test = Inside(coord_inside_mbr, poly)
+
     # return the points on the vertex of the geometry
     vertex_points = test.on_vertex()
     res = test.points_on_line()
@@ -222,19 +356,37 @@ def main(polygon, input):
     # print(count)
     # input the final points into the RCA
 
+    final_round = Polygon(not_classified, poly)
+    rca = final_round.rca()
+    rca_inside = rca[0]
+    rca_outside = rca[1]
+
+
+
 
     # Plotting
-    for i in range(len(coord_inside_mbr)):
-        plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
-    for i in range(len(vertex_points)):
-        plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
-    for i in range(len(coord_outside_mbr)):
-        plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
-    for i in range(len(coord_boundary)):
-        plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
+    # for i in range(len(coord_inside_mbr)):
+    #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'outside')
+    # for i in range(len(vertex_points)):
+    #     plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
+    # for i in range(len(coord_outside_mbr)):
+    #     plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
+    # for i in range(len(coord_boundary)):
+    #      plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
+    for i in range(len(rca_outside)):
+        plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
+    for i in range(len(rca_inside)):
+        plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
+    # for i in range(len(not_classified)):
+    #     plotter.add_point(not_classified[i][0], not_classified[i][1], 'inside')
+    # for i in range(len(coord_boundary)):
+    #     plotter.add_point(coord_boundary[i][0], coord_boundary[i][1])
+
 
 
     plotter.show()
+
+
 if __name__ == "__main__":
     # To Do
     # > Need to add a function that you can also add the output file path at the terminal
