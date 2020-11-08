@@ -2,7 +2,7 @@ from plotter import Plotter
 import sys
 
 
-def import_points(path):
+def import_csv(path):
     """
     Imports a CSV from chosen file path, then outputs an ID, X, Y list
     :param path is a directory to the csv file containing polygon points
@@ -320,7 +320,7 @@ def main(polygon, input):
     plotter = Plotter()
 
     # Import the polygon, export xs and ys, and plot
-    polygon_points = import_points(polygon)
+    polygon_points = import_csv(polygon)
     x_poly = polygon_points[1]
     y_poly = polygon_points[2]
     poly = list(zip(x_poly, y_poly))
@@ -332,7 +332,7 @@ def main(polygon, input):
     # plotter.add_poly_outline(mbr[0], mbr[1])
 
     # import the individual points
-    points = import_points(input)
+    points = import_csv(input)
     x = points[1]
     y = points[2]
 
@@ -348,14 +348,6 @@ def main(polygon, input):
     res = test.points_on_line()
     coord_boundary = res[0]
     not_classified = res[1]  # get the not yet classified points
-
-    # There are actually duplicates of points which can be seen here (why there are less points on graph)
-    # count = {}
-    # for coordinate in not_classified:
-    #     count.setdefault(coordinate, 0)
-    #     count[coordinate] += 1
-    # print(count)
-    # input the final points into the RCA
 
     final_round = Polygon(not_classified, poly)
     rca = final_round.rca()
