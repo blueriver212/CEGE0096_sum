@@ -1,5 +1,5 @@
 from plotter import Plotter
-
+from main_from_file import *
 
 def main():
     plotter = Plotter()
