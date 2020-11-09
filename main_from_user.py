@@ -1,5 +1,4 @@
 from plotter import Plotter
-import main_from_file as mf
 from main_from_file import *
 
 def main():
@@ -7,7 +6,7 @@ def main():
 
     print("read polygon.csv")
     path = input("Input the name of the relative path of your csv (include .csv): ")
-    res = mf.import_csv(path)
+    res = import_csv(path)
     poly_x, poly_y, poly = res[1], res[2], list(zip(res[1], res[2]))
     plotter.add_polygon(res[1], res[2])
 
@@ -19,7 +18,6 @@ def main():
     # # print("Insert point information")
     x = float(input("x coordinate: "))
     y = float(input("y coordinate: "))
-
     point = [(x, y)]
 
     # calculate if the point is inside the MBR
@@ -32,7 +30,7 @@ def main():
     if len(is_inside_mbr) == 0:
         plotter.add_point(is_outside_mbr[0][0], is_outside_mbr[0][1], 'outside')
 
-    #Check if it is on a vertex or line
+    # If inside MBR check if a vertex or on boundary
     inside_mbr_points = Inside(is_inside_mbr, poly)
     on_vertex = inside_mbr_points.on_vertex()
 

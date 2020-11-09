@@ -37,7 +37,6 @@ class MBR:
     """
     A class that takes a list of x and y coordinates of a polygon and then returns a Minimum Bounding Rectangle
     """
-
     def __init__(self, xs, ys):
         self.__xs = xs
         self.__ys = ys
@@ -103,7 +102,6 @@ class Inside:
 
     @staticmethod
     def on_line_func(x, x1, x2, y, y1, y2):
-
         """
         equation to test whether a point is on a line defined by (x1, y1) and (x2, y2)
         :param x: X coordinate of a the chosen point
@@ -114,7 +112,6 @@ class Inside:
         :param y2: Y coordinate of the other polygon point
         :return: True if the point is on the line, False if it is not.
         """
-
         if (x2 - x1) == 0:
             if x == x1 or x == x2:
                 return True  # This this stops the function returning a math error
@@ -131,7 +128,6 @@ class Inside:
         # not_classified = []
         # remove the vertex points for calculation, as already on boundary
         vertex_points = self.on_vertex()
-        print(vertex_points)
         points_to_test = [i for i in self.__coords if i not in vertex_points]
 
         for i in range(len(points_to_test)):
@@ -233,15 +229,14 @@ class Polygon:
 
             for edge in self.edge_list:
                 is_inside = self.cross_edge(point_x, point_y, edge)
-                if is_inside == True:
+                if is_inside:
                     count += 1
 
             if count % 2 == 0:
                 outside.append(point)
             else:
                 inside.append(point)
-            print(point)
-            print(count)
+
         return inside, outside
 
 
@@ -255,37 +250,6 @@ class RCA:
         # self.__ys = ys
         self.__points = points
         self.__poly = poly
-
-        # self.__points = zip(self.__xs, self.__ys) # make list of coordinate tuples
-        max_x = max(x for x, y in self.__poly) + 1  # Gives you 1 more x point in the x direction
-
-    def lines(self):
-        pass
-
-    @staticmethod
-    def slope(self, x1, x2, y1, y2):
-        # return the slope of two points
-        m = (y2 - y1) / (x2 - x1)
-        return m
-
-    def y_intercept(self):
-        b1 = self.y1 - (self.x1 * self.m1)
-        return b1
-
-    def intersection(self, x1, x2, y1, y2, x3, x4, y3, y4):
-        m1 = self.slope(x1, x2, y1, y2)  # slope of the first line
-        m2 = self.slope(x3, x4, y3, y4)  # slope of the second line
-
-        # calculate the point at which they intercept
-        x = (self.b2 - self.b1) / (self.m1 - self.m2)
-        y = ((self.b2 * self.m1) - (self.b1 * self.m2)) / (self.m1 - self.m2)
-        return x, y
-
-    def do_intersect(self):
-        """
-        tests whether two points intersect
-        :return:
-        """
 
     def get_intersection(self):
         intersection_points = []
@@ -311,16 +275,11 @@ class RCA:
         return intersection_points
 
 
-def main(polygon, input):
-    # # print("read polygon.csv")
-    # # print("read input.csv")
-    # # print("categorize points")
-    # # print("write output.csv")
-    # # print("plot polygon and points")
+def main(input_polygon, input_points):
     plotter = Plotter()
 
     # Import the polygon, export xs and ys, and plot
-    polygon_points = import_csv(polygon)
+    polygon_points = import_csv(input_polygon)
     x_poly = polygon_points[1]
     y_poly = polygon_points[2]
     poly = list(zip(x_poly, y_poly))
@@ -332,7 +291,7 @@ def main(polygon, input):
     # plotter.add_poly_outline(mbr[0], mbr[1])
 
     # import the individual points
-    points = import_csv(input)
+    points = import_csv(input_points)
     x = points[1]
     y = points[2]
 
@@ -368,13 +327,16 @@ def main(polygon, input):
 
     plotter.show()
 
+    # Creating a list for the output CSV
+    output_points = []
+
 
 if __name__ == "__main__":
     # To Do
     # > Need to add a function that you can also add the output file path at the terminal
 
     # input your file path of the polygon, the points into the main function
-    polygon = input('Type the filename of your polygon (include .csv):')
-    input = input('Type the filename of your testing points (include .csv):')
+    input_polygon = input('Type the filename of your polygon (include .csv):')
+    input_points = input('Type the filename of your testing points (include .csv):')
 
     main(polygon, input)
