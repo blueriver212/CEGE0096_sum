@@ -8,7 +8,8 @@ def import_csv(path):
     :param path is a directory to the csv file containing polygon points
     :return A tuple with the points' > [0]= IDs, [1] = Xs [2] = Ys:
     """
-    points_all, id_, x_, y_ = [], [], [], []
+    points_all, x_, y_, id_ = [], [], [], []
+
     # Open file
     with open(path, 'r') as f:
         points = f.readlines()
@@ -23,28 +24,27 @@ def import_csv(path):
         x_.append(i[1])
         y_.append(i[2])
 
-    # remove headers, convert to float
-    del x_[0]
-    del y_[0]
-    del id_[0]
-    del points_all[0]
+    # del the first column
+    del id_[0], x_[0], y_[0]
+
+    # # convert to float
     x = [float(i) for i in x_]
     y = [float(i) for i in y_]
+
     return id_, x, y
 
-
 class MBR:
-    """
-    A class that takes a list of x and y coordinates of a polygon and then returns a Minimum Bounding Rectangle
-    """
-    def __init__(self, xs, ys):
-        self.__xs = xs
-        self.__ys = ys
 
-        self.min_x = min(self.__xs)
-        self.max_x = max(self.__xs)
-        self.max_y = max(self.__ys)
-        self.min_y = min(self.__ys)
+    def __init__(self, poly):
+        self.__poly = poly
+
+        self.__poly_xs = self.__poly[1]
+        self.__poly_ys = self.__poly[2]
+
+        self.min_x = min(self.__poly_xs)
+        self.max_x = max(self.__poly_xs)
+        self.min_y = min(self.__poly_ys)
+        self.max_y = max(self.__poly_ys)
 
     def min_max(self):
         # coordinates of mbr polygon
@@ -57,10 +57,9 @@ class InsideMBR:
     """
     Takes x and y points, tests them against the polygon's MBR.
     """
-
-    def __init__(self, x_points, y_points, mbr_xs, mbr_ys):
-        self.x_points = x_points
-        self.y_points = y_points
+    def __init__(self, points, mbr_xs, mbr_ys):
+        self.x_points = points[0]
+        self.y_points = points[1]
         self.__mbr_xs = mbr_xs
         self.__mbr_ys = mbr_ys
 
@@ -155,7 +154,7 @@ class Inside:
         return on_line, not_classified
 
 
-class Polygon:
+class RayCasting:
 
     def __init__(self, points, poly):
         """
@@ -239,85 +238,48 @@ class Polygon:
 
         return inside, outside
 
-
-class RCA:
-    """
-    This takes all of the points that have not already been classified and conducts the RCA analysis.
-    """
-
-    def __init__(self, points, poly):
-        # self.__xs = xs
-        # self.__ys = ys
-        self.__points = points
-        self.__poly = poly
-
-    def get_intersection(self):
-        intersection_points = []
-
-        if self.do_intersect():
-            for i in range(1, len(self.__poly)):
-                x1_ = self.__poly[i - 1][0]
-                y1_ = self.__poly[i - 1][1]
-
-                x2_ = self.__poly[i][0]
-                y2_ = self.__poly[i][1]
-
-                for j in range(len(self.__points)):
-                    x3_ = self.__points([j][0])  # error seems to be here, list not callable
-                    y3_ = self.__points([j][1])
-
-                    x4_ = self.max_x  # Always tends to the same x value
-                    y4_ = y3_  # Always on the same horizontal plane, so same as y4
-
-                    test_intersection = self.intersection(x1_, x2_, y1_, y2_, x3_, x4_, y3_, y4_)
-                    intersection_points.append(test_intersection)
-
-        return intersection_points
-
-
 def main(input_polygon, input_points):
     plotter = Plotter()
 
-    # Import the polygon, export xs and ys, and plot
-    polygon_points = import_csv(input_polygon)
-    x_poly = polygon_points[1]
-    y_poly = polygon_points[2]
-    poly = list(zip(x_poly, y_poly))
-    plotter.add_polygon(x_poly, y_poly)
-
     # calculate and plot the MBR polygon
-    imp = MBR(x_poly, y_poly)
+    polygon_points = import_csv(input_polygon)
+    poly = list(zip(polygon_points[1], polygon_points[2]))
+    imp = MBR(polygon_points)
     mbr = imp.min_max()
-    # plotter.add_poly_outline(mbr[0], mbr[1])
+    plotter.add_polygon(polygon_points[1], polygon_points[2])
+    plotter.add_poly_outline(mbr[0], mbr[1])
 
     # import the individual points
-    points = import_csv(input_points)
-    x = points[1]
-    y = points[2]
+    temp_points = import_csv(input_points)
+    points_id, points = [temp_points[0]], [temp_points[1], temp_points[2]]
 
     # Test whether these points are within the Polygon's MBR
-    poly_mbr = InsideMBR(x, y, mbr[0], mbr[1])
+    poly_mbr = InsideMBR(points, mbr[0], mbr[1])
     mbr_ = poly_mbr.is_inside()
     coord_inside_mbr = mbr_[0]
     coord_outside_mbr = mbr_[1]
-    test = Inside(coord_inside_mbr, poly)
+    print(coord_inside_mbr)
+    print(poly)
 
-    # return the points on the vertex of the geometry
+    # # return the points on the vertex of the geometry
+    test = Inside(coord_inside_mbr, poly)
     vertex_points = test.on_vertex()
     res = test.points_on_line()
     coord_boundary = res[0]
     not_classified = res[1]  # get the not yet classified points
-
-    final_round = Polygon(not_classified, poly)
+    #
+    final_round = RayCasting(not_classified, poly)
     rca = final_round.rca()
     rca_inside = rca[0]
     rca_outside = rca[1]
-
-    # Plotting
+    # #
+    # # # Plotting
     for i in range(len(vertex_points)):
         plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
     for i in range(len(coord_outside_mbr)):
         plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
+    # for i in range(len(coord_inside_mbr)):
+    #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
     for i in range(len(coord_boundary)):
         plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
     for i in range(len(rca_outside)):
@@ -336,7 +298,7 @@ if __name__ == "__main__":
     # > Need to add a function that you can also add the output file path at the terminal
 
     # input your file path of the polygon, the points into the main function
-    input_polygon = input('Type the filename of your polygon (include .csv):')
-    input_points = input('Type the filename of your testing points (include .csv):')
+    input_polygon = 'polygon.csv' #input('Type the filename of your polygon (include .csv):')
+    input_points = 'input.csv' #input('Type the filename of your testing points (include .csv):')
 
-    main(polygon, input)
+    main(input_polygon, input_points)
