@@ -27,6 +27,9 @@ class Plotter:
         else:
             plt.plot(x, y, "ko", label='Unclassified')
 
+    def add_line(self, p1, p2):
+        plt.plot(p1, p2, "ro-")
+
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))

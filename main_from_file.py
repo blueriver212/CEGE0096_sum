@@ -10,8 +10,13 @@ def import_csv(path):
     """
     points_all, x_, y_, id_ = [], [], [], []
 
-    # Open file
     with open(path, 'r') as f:
+        #check that the input is CSV
+        # for each in f:
+        #     if len(f.split(',''')) > 2:
+        #         raise Exception
+        # print('Valid CSV')
+
         points = f.readlines()
         for row in points:
             row_stripped = row.strip("\n")
@@ -32,6 +37,16 @@ def import_csv(path):
     y = [float(i) for i in y_]
 
     return id_, x, y
+
+class Geometry:
+
+    def ___init__(self, name):
+        self.__name = name
+
+    # will this allow you to keep the id column?
+    def get_name(self):
+        return self.__name
+
 
 class MBR:
 
@@ -84,7 +99,7 @@ class InsideMBR:
         return coord_in_mbr, coord_out_mbr
 
 
-class Inside:
+class InsidePolygon:
     """
     This will determine whether a list of points are within a polygon.
     It will also return if it is on a vertex and a boundary.
@@ -244,55 +259,69 @@ def main(input_polygon, input_points):
     # calculate and plot the MBR polygon
     polygon_points = import_csv(input_polygon)
     poly = list(zip(polygon_points[1], polygon_points[2]))
-    imp = MBR(polygon_points)
-    mbr = imp.min_max()
+    MBR_values = MBR(polygon_points)
+    mbr = MBR_values.min_max()
     plotter.add_polygon(polygon_points[1], polygon_points[2])
     plotter.add_poly_outline(mbr[0], mbr[1])
 
     # import the individual points
-    temp_points = import_csv(input_points)
-    points_id, points = [temp_points[0]], [temp_points[1], temp_points[2]]
+    raw_points = import_csv(input_points)
+    points_id, points = [raw_points[0]], [raw_points[1], raw_points[2]]
 
     # Test whether these points are within the Polygon's MBR
-    poly_mbr = InsideMBR(points, mbr[0], mbr[1])
-    mbr_ = poly_mbr.is_inside()
-    coord_inside_mbr = mbr_[0]
-    coord_outside_mbr = mbr_[1]
-    print(coord_inside_mbr)
-    print(poly)
-
-    # # return the points on the vertex of the geometry
-    test = Inside(coord_inside_mbr, poly)
-    vertex_points = test.on_vertex()
-    res = test.points_on_line()
-    coord_boundary = res[0]
-    not_classified = res[1]  # get the not yet classified points
+    # poly_mbr = InsideMBR(points, mbr[0], mbr[1])
+    # mbr_ = poly_mbr.is_inside()
+    # coord_inside_mbr = mbr_[0]
+    # coord_outside_mbr = mbr_[1]
+    # print(coord_inside_mbr)
+    # print(poly)
     #
-    final_round = RayCasting(not_classified, poly)
-    rca = final_round.rca()
-    rca_inside = rca[0]
-    rca_outside = rca[1]
+    # # # return the points on the vertex of the geometry
+    # test = InsidePolygon(coord_inside_mbr, poly)
+    # vertex_points = test.on_vertex()
+    # res = test.points_on_line()
+    # coord_boundary = res[0]
+    # not_classified = res[1]  # get the not yet classified points
     # #
-    # # # Plotting
-    for i in range(len(vertex_points)):
-        plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
-    for i in range(len(coord_outside_mbr)):
-        plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
-    # for i in range(len(coord_inside_mbr)):
-    #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
-    for i in range(len(coord_boundary)):
-        plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
-    for i in range(len(rca_outside)):
-        plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
-    for i in range(len(rca_inside)):
-        plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
+    # final_round = RayCasting(not_classified, poly)
+    # rca = final_round.rca()
+    # rca_inside = rca[0]
+    # rca_outside = rca[1]
+    #
+    # output_points = {}
+    # output_classification = []
+    # # Plotting
+    # for i in range(len(vertex_points)):
+    #     plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
+    # for i in range(len(coord_outside_mbr)):
+    #     plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
+    #  # for i in range(len(coord_inside_mbr)):
+    #  #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
+    # for i in range(len(coord_boundary)):
+    #     plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
+    # for i in range(len(rca_outside)):
+    #     plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
+    # for i in range(len(rca_inside)):
+    #     plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
 
-    plotter.show()
+    #plot all of the rays
+    #every point
+    # max_x_in_points = max(raw_points[1])
+    # rca_rays = [raw_points[1], raw_points[2], [max_x_in_points] * 100, raw_points[2]]
+    # print(rca_rays)
+    # for i in range(len(rca_rays)):
+    #     plotter.add_point(rca_rays[i][2], rca_rays[i][3], 'outside')#, (rca_rays[i][2], rca_rays[i][3]))
 
-    # Creating a list for the output CSV
-    output_points = []
 
+    #need to create a list
+    num = [[1,5,4]]
+    test = [[1,2,3], ['a','b','c']]
+    new_list = []
+    for i in range(len(num[0])):
+        if i in test[0]:
+            new_list.append(test[1][i])
 
+    print(test[1])
 if __name__ == "__main__":
     # To Do
     # > Need to add a function that you can also add the output file path at the terminal

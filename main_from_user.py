@@ -58,9 +58,6 @@ def main():
             else:
                 plotter.add_point(outside_poly[0][0], outside_poly[0][1], 'outside')
 
-    # print("categorize point")
-    #
-    # print("plot polygon and point")
     plotter.show()
 
 
