@@ -11,12 +11,6 @@ def import_csv(path):
     points_all, x_, y_, id_ = [], [], [], []
 
     with open(path, 'r') as f:
-        #check that the input is CSV
-        # for each in f:
-        #     if len(f.split(',''')) > 2:
-        #         raise Exception
-        # print('Valid CSV')
-
         points = f.readlines()
         for row in points:
             row_stripped = row.strip("\n")
@@ -37,6 +31,20 @@ def import_csv(path):
     y = [float(i) for i in y_]
 
     return id_, x, y, points_all
+
+def export_csv(out_path, id, classification):
+
+    id.insert(0, 'id')
+    classification.insert(0, 'classification')
+    out_file = [id, classification]
+
+    with open(out_path, 'w') as f:
+        for i in range(len(out_file[0])):
+            f.write(out_file[0][i])
+            f.write(',')
+            f.write(out_file[1][i])
+            f.write('\n')
+
 
 class MBR:
 
@@ -59,10 +67,15 @@ class MBR:
 
 
 class InsideMBR:
-    """
-    Takes x and y points, tests them against the polygon's MBR.
-    """
+
     def __init__(self, points, mbr_xs, mbr_ys):
+        """
+        Finds the Minimum and Maximum of the MBR polygon.
+        :param points: A list of X and Y coordinates
+        :param mbr_xs:
+        :param mbr_ys:
+        """
+
         self.xpoints = points[0]
         self.ypoints = points[1]
         self.__mbr_xs = mbr_xs
@@ -79,8 +92,10 @@ class InsideMBR:
         Tests whether a random set of points are within the polygon's MBR
         :return: X and Y coordinates, either in or out.
         """
+
         coord_in_mbr = []
         coord_out_mbr = []
+
         for i in range(len(self.xpoints)):
             if self.min_xmbr <= self.xpoints[i] <= self.max_xmbr and self.min_ymbr <= self.ypoints[i] <= self.max_ymbr:
                 coord_in_mbr.append((self.xpoints[i], self.ypoints[i]))
@@ -177,6 +192,13 @@ class RayCasting:
 
     @staticmethod
     def cross_edge(point_x, point_y, edge):
+        """
+        This idea was taken from Philip Mons, 2017 (Source = philliplemons.com/posts/ray-casting-algorithm)
+        :param point_x: X value of a point
+        :param point_y: Y value of a point
+        :param edge: Two coordinates that make up an edge
+        :return: TRUE or FALSE depending on if ray from point intersects with edge
+        """
 
         _huge = sys.float_info.max  # _huge acts as infinity for ray
         _tiny = 0.0000001  # _tiny is used to make sure the points are not on vertices
@@ -224,7 +246,13 @@ class RayCasting:
         return intersect
 
     def rca(self):
+        """
+        This will take a list of points, and a list of edges, using the cross_edge() function will check
+        if a given point crosses any of the edges. If true, the count will increase. Even = Outside, Odd = Inside.
 
+        This is adapted from Rosseta Code (Source: rosettacode.org/wiki/Ray-casting_algorithm#Python)
+        :return: Two lists of points, ones that are inside the polygon, ones that are outside.
+        """
         inside = []
         outside = []
         for point in self.__points:
@@ -245,7 +273,7 @@ class RayCasting:
         return inside, outside
 
 
-def main(input_polygon, input_points):
+def main(input_polygon, input_points, out_path):
     plotter = Plotter()
 
     # calculate and plot the MBR polygon
@@ -289,13 +317,9 @@ def main(input_polygon, input_points):
     for i in range(len(vertex_points)):
         plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
         boundary_pnts.append(vertex_points[i])
-    # for i in range(len(not_classified)):
-    #     plotter.add_point(not_classified[i][0], not_classified[i][1])
     for i in range(len(coord_outside_mbr)):
         plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
         outside_pnts.append(coord_outside_mbr[i])
-    # for i in range(len(coord_inside_mbr)):
-    #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
     for i in range(len(coord_boundary)):
         plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
         boundary_pnts.append(coord_boundary[i])
@@ -318,13 +342,14 @@ def main(input_polygon, input_points):
     boundary[0].extend(outside[0])
     boundary[1].extend(outside[1])
 
-    # Finding the classification for each point and ID in original list
+    # Combining the original ID, X and Y, with the classification list.
     original_points = [(y, x) for x, y in zip(original_points[0], original_points[1])]
-    out_list = []
+    id = []
+    classification = []
     for point, flag in original_points:
         index = boundary[0].index(point)
-        x, y = point
-        out_list.append((flag, x, y, boundary[1][index]))
+        id.append(flag)
+        classification.append(boundary[1][index]) # returns the classification with the same coordinates as ID
 
     #for point, flag in final_points
     #plot all of the rays
@@ -335,23 +360,22 @@ def main(input_polygon, input_points):
     # for i in range(len(rca_rays)):
     #     plotter.add_point(rca_rays[i][2], rca_rays[i][3], 'outside')#, (rca_rays[i][2], rca_rays[i][3]))
 
-
-
-
-    #need to create a list
-
+    # Export points with classification
+    export_csv(out_path, id, classification)
     plotter.show()
 
 if __name__ == "__main__":
-    # To Do
-    # > Need to add a function that you can also add the output file path at the terminal
 
     # input your file path of the polygon, the points into the main function
     file_list = os.listdir()
-    print(file_list)
     while True:
+        """
+        This error handling ensures that the file contains .csv and that it is exists in relative path
+        Original Adapted from:
+        stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response
+        Stack Overflor User: Kevin, 2017 
+        """
         try:
-            # Note: Python 2.x users should us raw_input, the equivalent of 3.x's input
             input_polygon = input('Type the filename of your polygon (include .csv):')
             if ".csv" not in input_polygon:
                 raise(ValueError)
@@ -364,9 +388,9 @@ if __name__ == "__main__":
             continue
         else:
             break
+
     while True:
         try:
-            # Note: Python 2.x users should us raw_input, the equivalent of 3.x's input
             input_points = input('Type the filename of your testing points (include .csv):')
             if ".csv" not in input_points:
                     raise (ValueError)
@@ -380,4 +404,14 @@ if __name__ == "__main__":
         else:
             break
 
-    main(input_polygon, input_points)
+    while True:
+        try:
+            out_path = input('Type the name of your output file (include .csv):')
+            if ".csv" not in out_path:
+                    raise (ValueError)
+        except ValueError:
+            print('Name must end with .csv')
+            continue
+        else:
+            break
+    main(input_polygon, input_points, out_path)

@@ -33,5 +33,11 @@ class Plotter:
     def show(self):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
-        plt.legend(by_label.values(), by_label.keys())
+        # Taken from Trenton McKinney (2018)
+        # Source: https://stackoverflow.com/questions/4700614/how-to-put-the-legend-out-of-the-plot
+        plt.legend(by_label.values(), by_label.keys(),loc='upper center',
+                   bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
+        plt.xlabel('X Coordinate')
+        plt.ylabel('Y Coordinate')
+        plt.title('Classification of whether a point is Inside \n Outside or on the Boundary of a Polygon')
         plt.show()
