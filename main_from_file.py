@@ -3,6 +3,7 @@ from geometry_classes import *
 import sys
 import os
 
+
 def import_csv(path):
     """
     Imports a CSV from chosen file path, then outputs an ID, X, Y list
@@ -10,7 +11,6 @@ def import_csv(path):
     :return A tuple with the points' > [0]= IDs, [1] = Xs [2] = Ys:
     """
     points_all, x_, y_, id_ = [], [], [], []
-
     with open(path, 'r') as f:
         points = f.readlines()
         for row in points:
@@ -18,33 +18,31 @@ def import_csv(path):
             row_split = row_stripped.split(',')
             points_all.append(row_split)
 
-    # append to new lists
     for i in points_all:
         id_.append(i[0])
         x_.append(i[1])
         y_.append(i[2])
 
-    # del the first column
     del id_[0], x_[0], y_[0]
-
-    # # convert to float
     x = [float(i) for i in x_]
     y = [float(i) for i in y_]
 
     return id_, x, y, points_all
 
-def export_csv(out_path, id, classification):
 
-    id.insert(0, 'id')
+def export_csv(output_path, identification, classification):
+
+    identification.insert(0, 'id')
     classification.insert(0, 'classification')
-    out_file = [id, classification]
+    out_file = [identification, classification]
 
-    with open(out_path, 'w') as f:
+    with open(output_path, 'w') as f:
         for i in range(len(out_file[0])):
             f.write(out_file[0][i])
             f.write(',')
             f.write(out_file[1][i])
             f.write('\n')
+
 
 def main(input_polygon, input_points, out_path):
     plotter = Plotter()
@@ -66,48 +64,41 @@ def main(input_polygon, input_points, out_path):
     # Test whether these points are within the Polygon's MBR
     poly_mbr = InsideMBR(points, mbr[0], mbr[1])
     mbr_ = poly_mbr.is_inside()
-    coord_inside_mbr = mbr_[0]
-    coord_outside_mbr = mbr_[1]
+    coord_inside_mbr, coord_outside_mbr = mbr_[0], mbr_[1]
 
     # return the points on the vertex of the geometry
     test = Boundary(coord_inside_mbr, poly)
     vertex_points = test.on_vertex()
     res = test.points_on_line()
-    coord_boundary = res[0]
-    not_classified = res[1]
+    coord_boundary, not_classified = res[0], res[1]
 
     # Enter the non classified points into the RCA
     final_round = RayCasting(not_classified, poly)
     rca = final_round.rca()
-    rca_inside = rca[0]
-    rca_outside = rca[1]
+    rca_inside, rca_outside = rca[0], rca[1]
 
-
-    # plot and append all points
-    outside_pnts = []
-    boundary_pnts = []
-    inside_pnts = []
+    # plot and append all points to individual classified lists
+    outside_points, boundary_points, inside_points = [], [], []
     for i in range(len(vertex_points)):
         plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
-        boundary_pnts.append(vertex_points[i])
+        boundary_points.append(vertex_points[i])
     for i in range(len(coord_outside_mbr)):
         plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
-        outside_pnts.append(coord_outside_mbr[i])
+        outside_points.append(coord_outside_mbr[i])
     for i in range(len(coord_boundary)):
         plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
-        boundary_pnts.append(coord_boundary[i])
+        boundary_points.append(coord_boundary[i])
     for i in range(len(rca_outside)):
         plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
-        outside_pnts.append(rca_outside[i])
+        outside_points.append(rca_outside[i])
     for i in range(len(rca_inside)):
         plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
-        inside_pnts.append(rca_inside[i])
-
+        inside_points.append(rca_inside[i])
 
     # this provides a third list with the points classification
-    boundary = [boundary_pnts, ['boundary'] * len(boundary_pnts)]
-    inside = inside_pnts, ['inside'] * len(inside_pnts)
-    outside = outside_pnts, ['outside'] * len(outside_pnts)
+    boundary = [boundary_points, ['boundary'] * len(boundary_points)]
+    inside = inside_points, ['inside'] * len(inside_points)
+    outside = outside_points, ['outside'] * len(outside_points)
 
     # join all the points together in one list
     boundary[0].extend(inside[0])
@@ -117,16 +108,15 @@ def main(input_polygon, input_points, out_path):
 
     # Combining the original ID, X and Y, with the classification list.
     original_points = [(y, x) for x, y in zip(original_points[0], original_points[1])]
-    id = []
-    classification = []
+    id, classification = [], []
     for point, flag in original_points:
         index = boundary[0].index(point)
         id.append(flag)
         classification.append(boundary[1][index]) # returns the classification with the same coordinates as ID
 
-    #for point, flag in final_points
-    #plot all of the rays
-    #every point
+    # for point, flag in final_points
+    # plot all of the rays
+    # every point
     # max_x_in_points = max(raw_points[1])
     # rca_rays = [raw_points[1], raw_points[2], [max_x_in_points] * 100, raw_points[2]]
     # print(rca_rays)
@@ -135,7 +125,9 @@ def main(input_polygon, input_points, out_path):
 
     # Export points with classification
     export_csv(out_path, id, classification)
+
     plotter.show()
+
 
 if __name__ == "__main__":
 
@@ -166,9 +158,9 @@ if __name__ == "__main__":
         try:
             input_points = input('Type the filename of your testing points (include .csv):')
             if ".csv" not in input_points:
-                raise (ValueError)
+                raise ValueError
             if input_points not in file_list:
-                raise(FileNotFoundError)
+                raise FileNotFoundError
         except ValueError:
             print('Name must end with .csv')
         except FileNotFoundError:
@@ -181,9 +173,9 @@ if __name__ == "__main__":
         try:
             out_path = input('Type the name of your output file (include .csv):')
             if ".csv" not in out_path:
-                raise (ValueError)
+                raise ValueError
             if out_path in file_list:
-                raise (FileExistsError)
+                raise FileExistsError
         except ValueError:
             print('Name must end with .csv')
         except FileExistsError:
@@ -191,4 +183,5 @@ if __name__ == "__main__":
             continue
         else:
             break
+
     main(input_polygon, input_points, out_path)

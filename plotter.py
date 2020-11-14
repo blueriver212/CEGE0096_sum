@@ -1,5 +1,5 @@
 from collections import OrderedDict
-
+from geometry_classes import *
 import matplotlib
 import matplotlib.pyplot as plt
 
