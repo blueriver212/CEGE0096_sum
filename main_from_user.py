@@ -1,6 +1,6 @@
 from plotter import Plotter
 from main_from_file import *
-
+from geometry_classes import *
 def main():
     plotter = Plotter()
 
