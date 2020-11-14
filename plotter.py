@@ -39,5 +39,5 @@ class Plotter:
                    bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
         plt.xlabel('X Coordinate')
         plt.ylabel('Y Coordinate')
-        plt.title('Classification of whether a point is Inside \n Outside or on the Boundary of a Polygon')
+        plt.title('Classification of whether a point is Inside, \n Outside or on the Boundary of a Polygon')
         plt.show()
