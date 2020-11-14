@@ -1,6 +1,6 @@
 from plotter import Plotter
 import sys
-
+import os
 
 def import_csv(path):
     """
@@ -36,17 +36,7 @@ def import_csv(path):
     x = [float(i) for i in x_]
     y = [float(i) for i in y_]
 
-    return id_, x, y
-
-class Geometry:
-
-    def ___init__(self, name):
-        self.__name = name
-
-    # will this allow you to keep the id column?
-    def get_name(self):
-        return self.__name
-
+    return id_, x, y, points_all
 
 class MBR:
 
@@ -61,7 +51,7 @@ class MBR:
         self.min_y = min(self.__poly_ys)
         self.max_y = max(self.__poly_ys)
 
-    def min_max(self):
+    def mbr_coords(self):
         # coordinates of mbr polygon
         mbr_x = [self.min_x, self.max_x, self.max_x, self.min_x]
         mbr_y = [self.min_y, self.min_y, self.max_y, self.max_y]
@@ -73,8 +63,8 @@ class InsideMBR:
     Takes x and y points, tests them against the polygon's MBR.
     """
     def __init__(self, points, mbr_xs, mbr_ys):
-        self.x_points = points[0]
-        self.y_points = points[1]
+        self.xpoints = points[0]
+        self.ypoints = points[1]
         self.__mbr_xs = mbr_xs
         self.__mbr_ys = mbr_ys
 
@@ -91,15 +81,15 @@ class InsideMBR:
         """
         coord_in_mbr = []
         coord_out_mbr = []
-        for i in range(len(self.x_points)):
-            if self.min_xmbr <= self.x_points[i] <= self.max_xmbr and self.min_ymbr <= self.y_points[i] <= self.max_ymbr:
-                coord_in_mbr.append((self.x_points[i], self.y_points[i]))
+        for i in range(len(self.xpoints)):
+            if self.min_xmbr <= self.xpoints[i] <= self.max_xmbr and self.min_ymbr <= self.ypoints[i] <= self.max_ymbr:
+                coord_in_mbr.append((self.xpoints[i], self.ypoints[i]))
             else:
-                coord_out_mbr.append((self.x_points[i], self.y_points[i]))
+                coord_out_mbr.append((self.xpoints[i], self.ypoints[i]))
         return coord_in_mbr, coord_out_mbr
 
 
-class InsidePolygon:
+class Boundary:
     """
     This will determine whether a list of points are within a polygon.
     It will also return if it is on a vertex and a boundary.
@@ -111,11 +101,11 @@ class InsidePolygon:
 
     def on_vertex(self):
         # If x,y pairing is in poly file then it is a vertex of polygon.
-        res = [i for i in self.__coords if i in self.__poly]
-        return res
+        points_on_vertex = [i for i in self.__coords if i in self.__poly]
+        return points_on_vertex
 
     @staticmethod
-    def on_line_func(x, x1, x2, y, y1, y2):
+    def on_line_func( x, x1, x2, y, y1, y2):
         """
         equation to test whether a point is on a line defined by (x1, y1) and (x2, y2)
         :param x: X coordinate of a the chosen point
@@ -139,7 +129,7 @@ class InsidePolygon:
     def points_on_line(self):
         # find values for on_line_func
         on_line = []
-        # not_classified = []
+
         # remove the vertex points for calculation, as already on boundary
         vertex_points = self.on_vertex()
         points_to_test = [i for i in self.__coords if i not in vertex_points]
@@ -191,6 +181,7 @@ class RayCasting:
         _huge = sys.float_info.max  # _huge acts as infinity for ray
         _tiny = 0.0000001  # _tiny is used to make sure the points are not on vertices
 
+        # Ensures that the Y values of A is lower than B
         A, B = edge[0], edge[1]
         if A[1] > B[1]:
             A, B = B, A
@@ -198,13 +189,13 @@ class RayCasting:
         A_x, A_y = A[0], A[1]
         B_x, B_y = B[0], B[1]
 
-        # make sure that point does not intercept a vertex
+        # If point intercepts a vertex, then add a small y increase to move it off the path
         if point_y == A_y or point_y == B_y:
-            point_y += _tiny  # add the small value
+            point_y += _tiny
 
+        # If point intercepts a vertex, then add a small x increase to move it off the path
         if point_x == A_x or point_x == B_x:
-            point_x += _tiny  # add the small value
-
+            point_x += _tiny
         intersect = False
 
         if (point_y > B_y or point_y < A_y) or (point_x > max(A_x, B_x)):
@@ -253,6 +244,7 @@ class RayCasting:
 
         return inside, outside
 
+
 def main(input_polygon, input_points):
     plotter = Plotter()
 
@@ -260,50 +252,81 @@ def main(input_polygon, input_points):
     polygon_points = import_csv(input_polygon)
     poly = list(zip(polygon_points[1], polygon_points[2]))
     MBR_values = MBR(polygon_points)
-    mbr = MBR_values.min_max()
+    mbr = MBR_values.mbr_coords()
     plotter.add_polygon(polygon_points[1], polygon_points[2])
     plotter.add_poly_outline(mbr[0], mbr[1])
 
     # import the individual points
     raw_points = import_csv(input_points)
-    points_id, points = [raw_points[0]], [raw_points[1], raw_points[2]]
+    points_id, points = raw_points[0], [raw_points[1], raw_points[2]]
+    points_tuple = list(zip(raw_points[1], raw_points[2]))
+    original_points = [points_id, points_tuple]
 
     # Test whether these points are within the Polygon's MBR
-    # poly_mbr = InsideMBR(points, mbr[0], mbr[1])
-    # mbr_ = poly_mbr.is_inside()
-    # coord_inside_mbr = mbr_[0]
-    # coord_outside_mbr = mbr_[1]
-    # print(coord_inside_mbr)
-    # print(poly)
-    #
-    # # # return the points on the vertex of the geometry
-    # test = InsidePolygon(coord_inside_mbr, poly)
-    # vertex_points = test.on_vertex()
-    # res = test.points_on_line()
-    # coord_boundary = res[0]
-    # not_classified = res[1]  # get the not yet classified points
-    # #
-    # final_round = RayCasting(not_classified, poly)
-    # rca = final_round.rca()
-    # rca_inside = rca[0]
-    # rca_outside = rca[1]
-    #
-    # output_points = {}
-    # output_classification = []
-    # # Plotting
-    # for i in range(len(vertex_points)):
-    #     plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
-    # for i in range(len(coord_outside_mbr)):
-    #     plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
-    #  # for i in range(len(coord_inside_mbr)):
-    #  #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
-    # for i in range(len(coord_boundary)):
-    #     plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
-    # for i in range(len(rca_outside)):
-    #     plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
-    # for i in range(len(rca_inside)):
-    #     plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
+    poly_mbr = InsideMBR(points, mbr[0], mbr[1])
+    mbr_ = poly_mbr.is_inside()
+    coord_inside_mbr = mbr_[0]
+    coord_outside_mbr = mbr_[1]
 
+    # return the points on the vertex of the geometry
+    test = Boundary(coord_inside_mbr, poly)
+    vertex_points = test.on_vertex()
+    res = test.points_on_line()
+    coord_boundary = res[0]
+    not_classified = res[1]
+
+    # Enter the non classified points into the RCA
+    final_round = RayCasting(not_classified, poly)
+    rca = final_round.rca()
+    rca_inside = rca[0]
+    rca_outside = rca[1]
+
+
+    # plot and append all points
+    outside_pnts = []
+    boundary_pnts = []
+    inside_pnts = []
+    for i in range(len(vertex_points)):
+        plotter.add_point(vertex_points[i][0], vertex_points[i][1], 'boundary')
+        boundary_pnts.append(vertex_points[i])
+    # for i in range(len(not_classified)):
+    #     plotter.add_point(not_classified[i][0], not_classified[i][1])
+    for i in range(len(coord_outside_mbr)):
+        plotter.add_point(coord_outside_mbr[i][0], coord_outside_mbr[i][1], 'outside')
+        outside_pnts.append(coord_outside_mbr[i])
+    # for i in range(len(coord_inside_mbr)):
+    #     plotter.add_point(coord_inside_mbr[i][0], coord_inside_mbr[i][1], 'inside')
+    for i in range(len(coord_boundary)):
+        plotter.add_point(coord_boundary[i][0], coord_boundary[i][1], 'boundary')
+        boundary_pnts.append(coord_boundary[i])
+    for i in range(len(rca_outside)):
+        plotter.add_point(rca_outside[i][0], rca_outside[i][1], 'outside')
+        outside_pnts.append(rca_outside[i])
+    for i in range(len(rca_inside)):
+        plotter.add_point(rca_inside[i][0], rca_inside[i][1], 'inside')
+        inside_pnts.append(rca_inside[i])
+
+
+    # this provides a third list with the points classification
+    boundary = [boundary_pnts, ['boundary'] * len(boundary_pnts)]
+    inside = inside_pnts, ['inside'] * len(inside_pnts)
+    outside = outside_pnts, ['outside'] * len(outside_pnts)
+
+    # join all the points together in one list
+    boundary[0].extend(inside[0])
+    boundary[1].extend(inside[1])
+    boundary[0].extend(outside[0])
+    boundary[1].extend(outside[1])
+
+    # Finding the classification for each point and ID in original list
+    original_points = [(y, x) for x, y in zip(original_points[0], original_points[1])]
+    out_list = []
+    for point, flag in original_points:
+        index = boundary[0].index(point)
+        x, y = point
+        out_list.append((flag, x, y, boundary[1][index]))
+
+    #for point, flag in final_points
     #plot all of the rays
     #every point
     # max_x_in_points = max(raw_points[1])
@@ -313,21 +336,48 @@ def main(input_polygon, input_points):
     #     plotter.add_point(rca_rays[i][2], rca_rays[i][3], 'outside')#, (rca_rays[i][2], rca_rays[i][3]))
 
 
-    #need to create a list
-    num = [[1,5,4]]
-    test = [[1,2,3], ['a','b','c']]
-    new_list = []
-    for i in range(len(num[0])):
-        if i in test[0]:
-            new_list.append(test[1][i])
 
-    print(test[1])
+
+    #need to create a list
+
+    plotter.show()
+
 if __name__ == "__main__":
     # To Do
     # > Need to add a function that you can also add the output file path at the terminal
 
     # input your file path of the polygon, the points into the main function
-    input_polygon = 'polygon.csv' #input('Type the filename of your polygon (include .csv):')
-    input_points = 'input.csv' #input('Type the filename of your testing points (include .csv):')
+    file_list = os.listdir()
+    print(file_list)
+    while True:
+        try:
+            # Note: Python 2.x users should us raw_input, the equivalent of 3.x's input
+            input_polygon = input('Type the filename of your polygon (include .csv):')
+            if ".csv" not in input_polygon:
+                raise(ValueError)
+            if input_polygon not in file_list:
+                raise(FileNotFoundError)
+        except ValueError:
+            print('Name must end with .csv')
+        except FileNotFoundError:
+            print('This file is not in the folder.')
+            continue
+        else:
+            break
+    while True:
+        try:
+            # Note: Python 2.x users should us raw_input, the equivalent of 3.x's input
+            input_points = input('Type the filename of your testing points (include .csv):')
+            if ".csv" not in input_points:
+                    raise (ValueError)
+            if input_points not in file_list:
+                raise(FileNotFoundError)
+        except ValueError:
+            print('Name must end with .csv')
+        except FileNotFoundError:
+            print('This file is not in the folder.')
+            continue
+        else:
+            break
 
     main(input_polygon, input_points)
