@@ -1,5 +1,6 @@
 import sys
 
+
 class MBR:
 
     def __init__(self, poly):
@@ -8,21 +9,17 @@ class MBR:
         self.__poly_xs = self.__poly[1]
         self.__poly_ys = self.__poly[2]
 
-        self.min_x = min(self.__poly_xs)
-        self.max_x = max(self.__poly_xs)
-        self.min_y = min(self.__poly_ys)
-        self.max_y = max(self.__poly_ys)
-
-    def mbr_coords(self):
+    def mbr_coordinates(self):
         # coordinates of mbr polygon
-        mbr_x = [self.min_x, self.max_x, self.max_x, self.min_x]
-        mbr_y = [self.min_y, self.min_y, self.max_y, self.max_y]
+        mbr_x = [min(self.__poly_xs), max(self.__poly_xs), max(self.__poly_xs), min(self.__poly_xs)]
+        mbr_y = [min(self.__poly_ys), min(self.__poly_ys), max(self.__poly_ys), max(self.__poly_ys)]
         return mbr_x, mbr_y
 
 
-class InsideMBR:
+class InsideMBR(MBR):
 
     def __init__(self, points, mbr_xs, mbr_ys):
+
         """
         Finds the Minimum and Maximum of the MBR polygon.
         :param points: A list of X and Y coordinates
@@ -74,7 +71,7 @@ class Boundary:
         return points_on_vertex
 
     @staticmethod
-    def on_line_func( x, x1, x2, y, y1, y2):
+    def on_line_func(x, x1, x2, y, y1, y2):
         """
         equation to test whether a point is on a line defined by (x1, y1) and (x2, y2)
         :param x: X coordinate of a the chosen point
