@@ -3,8 +3,11 @@ from geometry_classes import *
 import sys
 import os
 
+
 def user():
+
     # input your file path of the polygon, the points into the main function
+    # Different types of errors that the user may face
     file_list = os.listdir()
     while True:
         """
@@ -16,9 +19,9 @@ def user():
         try:
             input_polygon = input('Type the filename of your polygon (include .csv):')
             if ".csv" not in input_polygon:
-                raise (ValueError)
+                raise ValueError
             if input_polygon not in file_list:
-                raise (FileNotFoundError)
+                raise FileNotFoundError
         except ValueError:
             print('Name must end with .csv')
         except FileNotFoundError:
@@ -89,6 +92,7 @@ def import_csv(path):
             row_split = row_stripped.split(',')
             points_all.append(row_split)
 
+    # to separate lists
     for i in points_all:
         id_.append(i[0])
         x_.append(i[1])
@@ -102,6 +106,13 @@ def import_csv(path):
 
 
 def export_csv(output_path, identification, classification):
+    """
+    Exports CSV of classified points.
+    :param output_path: Location of file
+    :param identification: Identification list of points (ID)
+    :param classification: Classification of points
+    :return:
+    """
 
     identification.insert(0, 'id')
     classification.insert(0, 'classification')
@@ -117,12 +128,13 @@ def export_csv(output_path, identification, classification):
 
 def main():
     plotter = Plotter()
-    errors = user()
+    files_ = user()
 
-    input_polygon = errors[0]
-    input_points = errors[1]
-    out_path = errors[2]
-    fig_path = errors[3]
+    # returning the file paths from the user
+    input_polygon = files_[0]
+    input_points = files_[1]
+    out_path = files_[2]
+    fig_path = files_[3]
 
     # calculate and plot the MBR polygon
     polygon_points = import_csv(input_polygon)
@@ -143,7 +155,7 @@ def main():
     mbr_ = poly_mbr.is_inside()
     coord_inside_mbr, coord_outside_mbr = mbr_[0], mbr_[1]
 
-    # return the points on the vertex of the geometry
+    # Return the points on the vertex of the geometry
     test = Boundary(coord_inside_mbr, poly)
     vertex_points = test.on_vertex()
     res = test.points_on_line()
@@ -153,6 +165,18 @@ def main():
     final_round = RayCasting(not_classified, poly)
     rca = final_round.rca()
     rca_inside, rca_outside = rca[0], rca[1]
+
+    # plot all of the rays
+    max_x_in_points = max(raw_points[1])  # highest x value in input points
+    max_xvalues = [max_x_in_points] * 100
+    ray_plotting_vals = list(zip(max_xvalues, raw_points[2]))
+    rays = []
+    for i in range(len(points_tuple)):
+        rays.append(
+            tuple([(points_tuple[i][0], points_tuple[i][1]), (ray_plotting_vals[i][0], ray_plotting_vals[i][1])]))
+
+    for i in range(len(rays)):
+        plotter.add_line(rays[i][0][0], rays[i][1][0], rays[i][0][1], rays[i][1][1])
 
     # plot and append all points to individual classified lists
     outside_points, boundary_points, inside_points = [], [], []
@@ -185,27 +209,14 @@ def main():
 
     # Combining the original ID, X and Y, with the classification list.
     original_points = [(y, x) for x, y in zip(original_points[0], original_points[1])]
-    id, classification = [], []
+    id_, classification = [], []
     for point, flag in original_points:
         index = boundary[0].index(point)
-        id.append(flag)
-        classification.append(boundary[1][index]) # returns the classification with the same coordinates as ID
-
-    # for point, flag in final_points
-    # plot all of the rays
-    # every point
-    # max_x_in_points = max(raw_points[1]) # highest x value in input points
-    # rca_rays = [raw_points[1], raw_points[2], [max_x_in_points] * 100, raw_points[2]]
-    # print(rca_rays[0])
-    # print(rca_rays[1])
-    # print(rca_rays[2])
-    # print(rca_rays[3])
-    #
-    # for i in range(len(rca_rays)):
-    #     plotter.add_line(rca_rays[0][i], rca_rays[1][i], rca_rays[2][i], rca_rays[3][i])
+        id_.append(flag)
+        classification.append(boundary[1][index])  # returns the classification with the same coordinates as ID
 
     # Export points with classification
-    export_csv(out_path, id, classification)
+    export_csv(out_path, id_, classification)
 
     plotter.show(fig_path)
 

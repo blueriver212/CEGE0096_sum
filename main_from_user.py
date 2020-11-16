@@ -26,11 +26,9 @@ def user():
             input_points = input('Enter your coordinates (x,y format):')
             to_float = [float(input_points.split(',')[0]), float((input_points.split(',')[1]))]
             break
-        except:
+        except ValueError:
             print('Please check the format of your points!')
     point.append(to_float)
-
-
 
     return point, path
 
@@ -54,7 +52,7 @@ def main():
     # print("Insert point information")
     x = points[0][0]
     y = points[0][1]
-    point = [(x,y)]
+    point = [(x, y)]
 
     # calculate if the point is inside the MBR
     mbr_test = InsideMBR(([x], [y]), poly_mbr[0], poly_mbr[1])
@@ -89,7 +87,7 @@ def main():
             outside_poly = final_round[1]
 
             # Plot if inside or outside polygon
-            if len(inside_poly) !=0:
+            if len(inside_poly) != 0:
                 plotter.add_point(inside_poly[0][0], inside_poly[0][1], 'inside')
                 classification.append('inside')
             else:
@@ -100,7 +98,10 @@ def main():
         print(f'Your chosen point is on the {classification[0]} of the polygon')
     else:
         print(f'Your chosen point is {classification[0]} the polygon')
-    plotter.show()
+
+    # Plot and save the file to your relative path
+    fig_path = 'User Points Plot.png'
+    plotter.show(fig_path)
 
 
 if __name__ == "__main__":

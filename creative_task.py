@@ -31,13 +31,14 @@ def exportcsv(output_path, identification, classification, x, y):
             f.write(out_file[3][i])
             f.write('\n')
 
+
 def main():
     london = 'london.csv'
     points = 'england_points.csv'
 
     plotter = Plotter()
 
-    #calculate and plot the MBR polygon
+    # calculate and plot the MBR polygon
     polygon_points = import_csv(london)
     poly = list(zip(polygon_points[1], polygon_points[2]))
     MBR_values = MBR(polygon_points)
@@ -98,45 +99,37 @@ def main():
 
     # Combining the original ID, X and Y, with the classification list.
     original_points = [(y, x) for x, y in zip(original_points[0], original_points[1])]
-    id, classification, xs, ys = [], [], [], []
+    id_, classification, xs, ys = [], [], [], []
     for point, flag in original_points:
         index = boundary[0].index(point)
         x, y = point
-        id.append(flag)
+        id_.append(flag)
         classification.append(boundary[1][index])  # returns the classification with the same coordinates as ID
         xs.append(x)
         ys.append(y)
     out_path = 'classified_london_points.csv'
-    exportcsv(out_path, id, classification, xs, ys)
+    exportcsv(out_path, id_, classification, xs, ys)
 
     plotter.show('London Points.png')
 
-#1. opening up the CSV with pandas
+    # opening up the CSV with pandas
     df = pd.read_csv('classified_london_points.csv')
-    print(df)
 
-    #turn the POINTS X, Y coordinates into point classes
+    # turn the POINTS X, Y coordinates into point classes
     london_points = df.apply(lambda row: Point(row.x, row.y), axis=1)
     london_points.crs = {'init': 'epsg:27700'}
 
-    points = gpd.GeoDataFrame(df, geometry = london_points)
+    # Plots the points with geopandas and matplotlib
+    points = gpd.GeoDataFrame(df, geometry=london_points)
     temp = points.to_crs(epsg=3857)
-    ax = temp.plot(column=points.classification, categorical = True, markersize = 100,legend = True, cmap = 'tab20')
+    ax = temp.plot(column=points.classification, categorical=True, markersize=100, legend=True, cmap='tab20')
     ctx.add_basemap(ax)
 
-    #Convert the polygon into shapefile
-    # df1 = pd.read_csv('london.csv')
-    # df1['geometry'] = df1.apply(lambda row: Point(row.x, row.y), axis =1)
-    # df1 = gpd.GeoDataFrame(df1, crs = 'epsg:27700')
-    # poly = Polygon([(p.x, p.y) for p in df1.geometry])
-    # at = poly
-    plt.ylabel('Longitude')
-    plt.xlabel('Latitude')
+    plt.ylabel('Northing')
+    plt.xlabel('Easting')
     plt.title('Are your points inside or outside London?')
 
     plt.show()
-
-
 
 
 if __name__ == "__main__":

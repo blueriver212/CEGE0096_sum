@@ -10,16 +10,18 @@ class MBR:
         self.__poly_ys = self.__poly[2]
 
     def mbr_coordinates(self):
-        # coordinates of mbr polygon
+        """
+        Calculates the four corners of the MBR polygon
+        :return: Lists of the X and Y coordinates
+        """
         mbr_x = [min(self.__poly_xs), max(self.__poly_xs), max(self.__poly_xs), min(self.__poly_xs)]
         mbr_y = [min(self.__poly_ys), min(self.__poly_ys), max(self.__poly_ys), max(self.__poly_ys)]
         return mbr_x, mbr_y
 
 
-class InsideMBR(MBR):
+class InsideMBR:
 
     def __init__(self, points, mbr_xs, mbr_ys):
-
         """
         Finds the Minimum and Maximum of the MBR polygon.
         :param points: A list of X and Y coordinates
@@ -66,7 +68,10 @@ class Boundary:
         self.__poly = poly
 
     def on_vertex(self):
-        # If x,y pairing is in poly file then it is a vertex of polygon.
+        """
+        Checks if an input point is in the list of polygons - corroborating it is on a vertx
+        :return: A list of points on vertex.
+        """
         points_on_vertex = [i for i in self.__coords if i in self.__poly]
         return points_on_vertex
 
@@ -82,18 +87,23 @@ class Boundary:
         :param y2: Y coordinate of the other polygon point
         :return: True if the point is on the line, False if it is not.
         """
+        # This this stops the function returning a math error (can't divide by 0)
         if (x2 - x1) == 0:
             if x == x1 or x == x2:
-                return True  # This this stops the function returning a math error
+                return True
+        # equation for if point is on the line
         else:
-            y_temp = ((x - x1) / (x2 - x1)) * (y2 - y1) + y1  # equation for if point is on the line
+            y_temp = ((x - x1) / (x2 - x1)) * (y2 - y1) + y1
             if y == y_temp:
                 return True
             else:
                 return False
 
     def points_on_line(self):
-        # find values for on_line_func
+        """
+        Returns the points that are on a line of polygon
+        :return: A list of on line points, and not yet classified points
+        """
         on_line = []
 
         # remove the vertex points for calculation, as already on boundary
@@ -107,7 +117,8 @@ class Boundary:
 
             for j in range(1, len(self.__poly)):
 
-                one_coord = self.__poly[j - 1]  # as range starts at 1, this will look at the first point in the list
+                # Starts by looking at the first two points of the list
+                one_coord = self.__poly[j - 1]
                 two_coord = self.__poly[j]
                 x1 = one_coord[0]
                 y1 = one_coord[1]
@@ -118,8 +129,6 @@ class Boundary:
                 if self.on_line_func(x, x1, x2, y, y1, y2):
                     if min(y1, y2) <= y <= max(y1, y2) and min(x1, x2) <= x <= max(x1, x2):  # little mbr algorithm
                         on_line.append((x, y))
-                    # else:
-                    #     not_classified.append((x,y)) #not classified points
 
         not_classified = [i for i in points_to_test if i not in on_line]
         return on_line, not_classified
@@ -179,6 +188,7 @@ class RayCasting:
             intersect = True
             return intersect
 
+        # Fix for if both X or Y values are 0
         try:
             m_edge = (B_y - A_y) / (B_x - A_x)
         except ZeroDivisionError:

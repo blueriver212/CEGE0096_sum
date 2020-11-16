@@ -1,0 +1,203 @@
+commit f1eb4fc54605543994f6f844061d56694f0e671a
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 11:54:21 2020 +0000
+
+    Fix: Adding labels and legend to creative task plots
+
+commit 2e53b079dfc3f830821928e6fa455d04aeee2d95
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 11:17:32 2020 +0000
+
+    Feature: Adding a fig_plot save func
+
+commit bcbb129fb69083feec2c5ee71a48216b7f907f07
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 11:16:56 2020 +0000
+
+    Feature: Adding a user input function with error handling
+
+commit 2893180d3012a3b8f43af29ce96af3b0a09b497a
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 11:16:25 2020 +0000
+
+    Fix: finding bug in MBR class, fixed
+
+commit 25e9c70a3460d7f73887224bf5f334740c719918
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 11:15:19 2020 +0000
+
+    Feature: Adding a user input function with error handling
+
+commit 3be93e823b38415f9f3bec4a32b73fb350b4bb0b
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 16 10:42:29 2020 +0000
+
+    Feature: Addding a London Map for Report - creative task
+
+commit 72e8e1625746c7037809095c405984b640ceb0e5
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sun Nov 15 23:18:04 2020 +0000
+
+    Feature: Added london plotting with basemap
+
+commit be937c4f537815ac24ec17e01d4b4dac5751b6f5
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 19:09:25 2020 +0000
+
+    Fix: Updating PEP8 styles to all files
+
+commit 0ab6d1a7e731ed2dda5286891b1ba93df3fd14bf
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 18:53:02 2020 +0000
+
+    FIX: importing new class file
+
+commit 64849549f20263f24a163f2e96d6c7bdef686c5b
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 18:52:51 2020 +0000
+
+    FIX: importing new class file
+
+commit 53a9270c773665ecafcf75d375d450a1cc76862e
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 18:52:33 2020 +0000
+
+    Feature: A new file just for MRB and RCA classes
+
+commit 2bc891d8138ef6d83d386295dd36ef0cc9e26b92
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 18:38:21 2020 +0000
+
+    Fix: Grammatical Error in plot title
+
+commit 01396b4740155bf4c26e67b96e291a04a3571364
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 18:18:53 2020 +0000
+
+    Feature: Adding axes to the labels, and changing format of .plotlegend
+
+commit f7b359d28fa2968ed7c3e624cefe6cc7b07e743a
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 14 15:09:02 2020 +0000
+
+    Feature: Creating an output file of points and their classification
+
+commit e71affdcab3310c1741559a86d4d6d64301f48bd
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Fri Nov 13 22:42:33 2020 +0000
+
+    Feature: Added a print statment, telling the user where their point is
+
+commit d5522b1ae2674ade9af5e283673dc9a5e00f581b
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Fri Nov 13 16:27:18 2020 +0000
+
+    Feature: Boundary Points image for report
+
+commit beaf1dadfcf1fb7587b62be20c0904c3aef6a4ef
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Fri Nov 13 15:42:46 2020 +0000
+
+    Feature: Plot of vertex points
+
+commit cf6424f8b762f6fa84aca4dd0eabb14b4667cbc3
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Fri Nov 13 15:15:09 2020 +0000
+
+    Feature: Adding a Figure of MBR points for report
+
+commit 5aea52b31756c61dd970fb685a8a8f9cb418927c
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Thu Nov 12 22:15:12 2020 +0000
+
+    Feature: Adding a ray plotting function
+
+commit b3c03838873d7773c1b90eea33363bfec6b6d7bf
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Thu Nov 12 14:36:43 2020 +0000
+
+    Fix: Changed the input of classes to all accept points and polyons, rather than X and Ys separately
+
+commit a264da504036cdf04d3f82d540e3b163ddf5d3a5
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Mon Nov 9 11:59:25 2020 +0000
+
+    Fix: Removing old classes that are not used, also updating some PEP8 Issues
+
+commit 29f215052570957fd7f194677f838eebe36895b4
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sun Nov 8 18:24:18 2020 +0000
+
+    Feature: Completed the main_from_user, you can now add a point from terminal, drawing on the classes from main_from_file
+
+commit 867b0cfa21237f91185a660edbf1fd659c2c9cb6
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sun Nov 8 15:20:29 2020 +0000
+
+    Fix: Correcting PEP8 methods
+
+commit bbdd513a3920a6a464e2ff59ab24e2be50a642f2
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sat Nov 7 20:05:14 2020 +0000
+
+    Feature: Adding a class that calculates points inside or outside a polygon based on the Ray Casting Algorithm
+
+commit 0f7f0e92eb32f8804440cdaed48416a2f06418af
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Thu Nov 5 20:03:22 2020 +0000
+
+    Feature: Added a function to take input and polgon files from terminal.
+
+commit 59156becfb63cd947fcb0ffe46b00fa99d33bc48
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Wed Nov 4 22:12:40 2020 +0000
+
+    FIX: Corrected bug in Inside class, which could not predict points at x = 0 and x = 4
+
+commit 0d159c5a8459a7dd2d62a67b70c3f8ae6e9ba0a4
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Wed Nov 4 11:55:24 2020 +0000
+
+    Fix: Now added the correct code to calculate MBR on polygon, and test vs input csv
+
+commit 305c7d67263198bbd9c0e2c20736596b87b1d430
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 20:35:18 2020 +0000
+
+    fix: corrected error in MBR class, also added corrected plotting issue
+
+commit 6a6fbabd34483d7a80331d12bfb8a0a113a3f1ef
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 17:32:47 2020 +0000
+
+    Feature: Adding Minimum Boundary Polygon Class
+
+commit 6d54774f2558eef7210a585e29eaaece1e4c458b
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 15:11:39 2020 +0000
+
+    Feature: Adding a csv_reader and plotting function
+
+commit 4d8477dacccf839b37bbd7819b24dd3fae4c2736
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 13:41:15 2020 +0000
+
+    Feature: adding idea folder
+
+commit 92565120c55fcbc73377b5e6317cce986caff467
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 13:40:16 2020 +0000
+
+    Feature: Adding the files from Aldo Assignment on Moodle
+
+commit 44274f769bf233cb9b3aea67caa68874d70c47f2
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Tue Nov 3 13:38:41 2020 +0000
+
+    Feature: Adding the files from Aldo Assignment on Moodle
+
+commit 383bc8b904c6fea53de9342a400edd88a6fe970d
+Author: blueriver212 <indy.brownhall@gmail.com>
+Date:   Sun Nov 1 16:14:22 2020 +0000
+
+    Add: Creating repo and adding readme file
