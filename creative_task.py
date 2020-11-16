@@ -109,7 +109,7 @@ def main():
     out_path = 'classified_london_points.csv'
     exportcsv(out_path, id, classification, xs, ys)
 
-    plotter.show()
+    plotter.show('London Points.png')
 
 #1. opening up the CSV with pandas
     df = pd.read_csv('classified_london_points.csv')
@@ -121,7 +121,7 @@ def main():
 
     points = gpd.GeoDataFrame(df, geometry = london_points)
     temp = points.to_crs(epsg=3857)
-    ax = temp.plot(column=points.classification)
+    ax = temp.plot(column=points.classification, categorical = True, markersize = 100,legend = True, cmap = 'tab20')
     ctx.add_basemap(ax)
 
     #Convert the polygon into shapefile
@@ -130,6 +130,10 @@ def main():
     # df1 = gpd.GeoDataFrame(df1, crs = 'epsg:27700')
     # poly = Polygon([(p.x, p.y) for p in df1.geometry])
     # at = poly
+    plt.ylabel('Longitude')
+    plt.xlabel('Latitude')
+    plt.title('Are your points inside or outside London?')
+
     plt.show()
 
 
