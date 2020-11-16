@@ -28,7 +28,7 @@ class Plotter:
             plt.plot(x, y, "ko", label='Unclassified')
 
     def add_line(self, x1, x2, y1, y2):
-        plt.plot([x1, x2], [y1, y2], "ro-", linewidth=0.3, markersize=0, alpha=0.3)
+        plt.plot([x1, x2], [y1, y2], "ro-", linewidth=0.3, markersize=0, alpha=0.3, label='Ray')
 
     def show(self, fig_path):
         handles, labels = plt.gca().get_legend_handles_labels()
