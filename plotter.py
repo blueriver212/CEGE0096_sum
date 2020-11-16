@@ -27,10 +27,10 @@ class Plotter:
         else:
             plt.plot(x, y, "ko", label='Unclassified')
 
-    def add_line(self, p1, p2):
-        plt.plot(p1, p2, "ro-")
+    # def add_line(self, x1, y1, x2, y2):
+    #     plt.plot([x1, y1], [x2, y2], "ro-")
 
-    def show(self):
+    def show(self, fig_path):
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
         # Taken from Trenton McKinney (2018)
@@ -40,4 +40,5 @@ class Plotter:
         plt.xlabel('X Coordinate')
         plt.ylabel('Y Coordinate')
         plt.title('Classification of whether a point is Inside, \n Outside or on the Boundary of a Polygon')
+        plt.savefig(fig_path)
         plt.show()
