@@ -3,6 +3,77 @@ from geometry_classes import *
 import sys
 import os
 
+def user():
+    # input your file path of the polygon, the points into the main function
+    file_list = os.listdir()
+    while True:
+        """
+        This error handling ensures that the file contains .csv and that it is exists in relative path
+        Original Adapted from:
+        stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response
+        Stack Overflow User: Kevin, 2017 
+        """
+        try:
+            input_polygon = input('Type the filename of your polygon (include .csv):')
+            if ".csv" not in input_polygon:
+                raise (ValueError)
+            if input_polygon not in file_list:
+                raise (FileNotFoundError)
+        except ValueError:
+            print('Name must end with .csv')
+        except FileNotFoundError:
+            print('This file is not in the folder.')
+            continue
+        else:
+            break
+
+    while True:
+        try:
+            input_points = input('Type the filename of your testing points (include .csv):')
+            if ".csv" not in input_points:
+                raise ValueError
+            if input_points not in file_list:
+                raise FileNotFoundError
+        except ValueError:
+            print('Name must end with .csv')
+        except FileNotFoundError:
+            print('This file is not in the folder.')
+            continue
+        else:
+            break
+
+    while True:
+        try:
+            out_path = input('Type the name of your output file (include .csv):')
+            if ".csv" not in out_path:
+                raise ValueError
+            if out_path in file_list:
+                raise FileExistsError
+        except ValueError:
+            print('Name must end with .csv')
+        except FileExistsError:
+            print('File already exists')
+            continue
+        else:
+            break
+
+    while True:
+        try:
+            fig_path = input('Type the name of your output plot (include .png):')
+            if ".png" not in fig_path:
+                raise ValueError
+            if out_path in file_list:
+                raise FileExistsError
+        except ValueError:
+            print('Name must end with .png')
+        except FileExistsError:
+            print('File already exists')
+            continue
+        else:
+            break
+
+    return input_polygon, input_points, out_path, fig_path
+
 
 def import_csv(path):
     """
@@ -44,14 +115,20 @@ def export_csv(output_path, identification, classification):
             f.write('\n')
 
 
-def main(input_polygon, input_points, out_path):
+def main():
     plotter = Plotter()
+    errors = user()
+
+    input_polygon = errors[0]
+    input_points = errors[1]
+    out_path = errors[2]
+    fig_path = errors[3]
 
     # calculate and plot the MBR polygon
     polygon_points = import_csv(input_polygon)
     poly = list(zip(polygon_points[1], polygon_points[2]))
     MBR_values = MBR(polygon_points)
-    mbr = MBR_values.mbr_coords()
+    mbr = MBR_values.mbr_coordinates()
     plotter.add_polygon(polygon_points[1], polygon_points[2])
     plotter.add_poly_outline(mbr[0], mbr[1])
 
@@ -117,71 +194,21 @@ def main(input_polygon, input_points, out_path):
     # for point, flag in final_points
     # plot all of the rays
     # every point
-    # max_x_in_points = max(raw_points[1])
+    # max_x_in_points = max(raw_points[1]) # highest x value in input points
     # rca_rays = [raw_points[1], raw_points[2], [max_x_in_points] * 100, raw_points[2]]
-    # print(rca_rays)
+    # print(rca_rays[0])
+    # print(rca_rays[1])
+    # print(rca_rays[2])
+    # print(rca_rays[3])
+    #
     # for i in range(len(rca_rays)):
-    #     plotter.add_point(rca_rays[i][2], rca_rays[i][3], 'outside')#, (rca_rays[i][2], rca_rays[i][3]))
+    #     plotter.add_line(rca_rays[0][i], rca_rays[1][i], rca_rays[2][i], rca_rays[3][i])
 
     # Export points with classification
     export_csv(out_path, id, classification)
 
-    plotter.show()
+    plotter.show(fig_path)
 
 
 if __name__ == "__main__":
-
-    # input your file path of the polygon, the points into the main function
-    file_list = os.listdir()
-    while True:
-        """
-        This error handling ensures that the file contains .csv and that it is exists in relative path
-        Original Adapted from:
-        stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response
-        Stack Overflor User: Kevin, 2017 
-        """
-        try:
-            input_polygon = input('Type the filename of your polygon (include .csv):')
-            if ".csv" not in input_polygon:
-                raise(ValueError)
-            if input_polygon not in file_list:
-                raise(FileNotFoundError)
-        except ValueError:
-            print('Name must end with .csv')
-        except FileNotFoundError:
-            print('This file is not in the folder.')
-            continue
-        else:
-            break
-
-    while True:
-        try:
-            input_points = input('Type the filename of your testing points (include .csv):')
-            if ".csv" not in input_points:
-                raise ValueError
-            if input_points not in file_list:
-                raise FileNotFoundError
-        except ValueError:
-            print('Name must end with .csv')
-        except FileNotFoundError:
-            print('This file is not in the folder.')
-            continue
-        else:
-            break
-
-    while True:
-        try:
-            out_path = input('Type the name of your output file (include .csv):')
-            if ".csv" not in out_path:
-                raise ValueError
-            if out_path in file_list:
-                raise FileExistsError
-        except ValueError:
-            print('Name must end with .csv')
-        except FileExistsError:
-            print('File already exists')
-            continue
-        else:
-            break
-
-    main(input_polygon, input_points, out_path)
+    main()
