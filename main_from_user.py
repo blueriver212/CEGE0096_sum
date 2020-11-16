@@ -1,33 +1,65 @@
+import os
 from plotter import Plotter
 from main_from_file import *
 from geometry_classes import *
+
+
+def user():
+
+    avail_files = os.listdir()
+    while True:
+        try:
+            path = input("Input the name of the relative path of your polygon (include .csv): ")
+            if ".csv" not in path:
+                raise ValueError
+            if path not in avail_files:
+                raise FileNotFoundError
+            break
+        except ValueError:
+            print('Must end with .csv')
+        except FileNotFoundError:
+            print('This file is not in the folder.')
+
+    point = []
+    while True:
+        try:
+            input_points = input('Enter your coordinates (x,y format):')
+            to_float = [float(input_points.split(',')[0]), float((input_points.split(',')[1]))]
+            break
+        except:
+            print('Please check the format of your points!')
+    point.append(to_float)
+
+
+
+    return point, path
+
+
 def main():
     plotter = Plotter()
 
-    print("read polygon.csv")
-    path = input("Input the name of the relative path of your polygon (include .csv): ")
+    user_inputs = user()
+    points = user_inputs[0]
+    path = user_inputs[1]
+
     res = import_csv(path)
-    # print(res)
     poly_x, poly_y, poly = res[1], res[2], list(zip(res[1], res[2]))
-    #poly_ = [poly_x], [poly_y]
     plotter.add_polygon(res[1], res[2])
 
     # first create the mbr from the polygon
     mbr = MBR(res)
-    poly_mbr = mbr.mbr_coords()
-    print(poly_mbr)
+    poly_mbr = mbr.mbr_coordinates()
     plotter.add_poly_outline(poly_mbr[0], poly_mbr[1])
-    #
-    # # print("Insert point information")
-    x = float(input("x coordinate: "))
-    y = float(input("y coordinate: "))
-    point = [(x, y)]
+
+    # print("Insert point information")
+    x = points[0][0]
+    y = points[0][1]
+    point = [(x,y)]
 
     # calculate if the point is inside the MBR
     mbr_test = InsideMBR(([x], [y]), poly_mbr[0], poly_mbr[1])
     mbr_output = mbr_test.is_inside()
-    is_inside_mbr = mbr_output[0]
-    is_outside_mbr = mbr_output[1]
+    is_inside_mbr, is_outside_mbr = mbr_output[0], mbr_output[1]
 
     # plot the point if outside Minimum Boundary Rectangle
     if len(is_inside_mbr) == 0:
@@ -38,14 +70,14 @@ def main():
     on_vertex = inside_mbr_points.on_vertex()
 
     classification = []
-    # plot point if on vertex
+    # First check and plot the point if on vertex
     if len(on_vertex) != 0:
         plotter.add_point(on_vertex[0][0], on_vertex[0][1], 'boundary')
         classification.append('boundary')
     else:
         point_on_line = inside_mbr_points.points_on_line()
 
-        # check if the point is on boundary
+        # Then if the point is on boundary
         if len(point_on_line[0]) != 0:
             plotter.add_point(point_on_line[0][0][0], point_on_line[0][0][1], 'boundary')
             classification.append('boundary')
