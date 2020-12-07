@@ -1,5 +1,5 @@
 CEGE0096_sum
-This is Indigo Brownhall's Assignment 1 for CEGE0096 Summative. 
+This is Indigo Brownhall's Assignment 1 for CEGE0096 Summative (Grade = 94%). 
 
 This software was written in Python 3.7.6 and will be compatible with anything above Python 3. It requires the sys, os and matplotlib packages to be already installed. 
 After cloning the project from github (blueriver212/CEGE0096_sum), the tasks can be run from the cmd line. Everything is required to be in the same directory. The user will need to paste in a chosen polygon and point csv files here.
